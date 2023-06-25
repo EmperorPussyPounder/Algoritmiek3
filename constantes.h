@@ -6,6 +6,8 @@
 const int MaxDimensie = 5;
 const int Leeg = 0;
 const int Gevuld = 1;
+const int MinScore = 0;
+const int MaxScore = (MaxDimensie*2)*MaxDimensie*MaxDimensie;
 // TODO: uw eigen constantes
 
 #endif

@@ -136,6 +136,7 @@ bool Azul::doeZet (int rij, int kolom)
 
     bord[rij][kolom] = true;
     gedaneZetten.push_back(make_pair(rij, kolom));
+    --beschikbareVakjes;
 
     scoreBerekening(rij, kolom);
 
@@ -151,6 +152,7 @@ bool Azul::unDoeZet ()
         return false;
     }
 
+    ++beschikbareVakjes;
     totaleScore -= score.back();
     score.pop_back();
 
@@ -169,10 +171,8 @@ bool Azul::bepaalMiniMaxiScoreRec(int &mini, long long &volgordesMini, int &maxi
     if (!geldigBord){
         return false;
     }
-    const auto INT_MAX = 999999999;
-    const auto INT_MIN = -1*INT_MAX;
-    mini = INT_MAX;
-    maxi = INT_MIN;
+    mini = MaxScore;
+    maxi = MinScore;
     volgordesMini = 0;
     volgordesMaxi = 0;
 
