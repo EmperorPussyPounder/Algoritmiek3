@@ -190,8 +190,8 @@ bool Azul::bepaalMiniMaxiScoreRec(int &mini, long long &volgordesMini, int &maxi
                 doeZet(i, j);
 
                 // Recursieve aanroep
-                int huidigeMini, huidigeMaxi;
-                long long huidigeVolgordesMini, huidigeVolgordesMaxi;
+                int huidigeMini = 0, huidigeMaxi = 0;
+                long long huidigeVolgordesMini = 0, huidigeVolgordesMaxi = 0;
                 bepaalMiniMaxiScoreRec(huidigeMini, huidigeVolgordesMini, huidigeMaxi, huidigeVolgordesMaxi);
 
                 if (huidigeMini < mini){
@@ -248,7 +248,9 @@ bool Azul::bepaalMiniMaxiScoreBU (int &mini, long long &volgordesMini,
 void Azul::drukAfZettenReeksen (vector<pair <int,int> > &zettenReeksMini,
                                 vector<pair <int,int> > &zettenReeksMaxi)
 {
-  // TODO: implementeer deze memberfunctie
+  if (zettenReeksMini.empty()) {
+      cout << "Geen zetten. \n";
+  }
 
 }  // drukAfZettenReeksen
 
