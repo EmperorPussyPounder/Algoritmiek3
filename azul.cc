@@ -80,13 +80,13 @@ bool Azul::leesInBord (const char* invoerNaam)
     for (int i = 0; i < hoogte; ++i) {
         for (int j = 0; j < breedte; ++j) {
             fin >> input;
-            if (!integerInBereik("bord vakje", input, Leeg, Gevuld))
-            {
+            if (!integerInBereik("bord vakje", input, Leeg, Gevuld)) {
                 fin.close();
                 return geldigBord;
             }
             tempBord[i][j] = input;
             beschikbareVakjes -= input;
+        }
     }
     fin.close();
     geldigBord = true;
