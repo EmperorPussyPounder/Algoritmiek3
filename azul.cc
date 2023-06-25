@@ -138,7 +138,10 @@ bool Azul::doeZet (int rij, int kolom)
     gedaneZetten.push_back(make_pair(rij, kolom));
     --beschikbareVakjes;
 
-    scoreBerekening(rij, kolom);
+    auto scoreVakje = scoreBerekening(rij, kolom);
+    score.push_back(scoreVakje);
+
+    totaleScore += scoreVakje;
 
     return true;
 
@@ -234,7 +237,7 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
 
   bepaalMiniMaxiScoreTD(mini, volgordesMini, maxi, volgordesMaxi,
                         bedekking, mogelijkeBedekkingen, maxScores, minScores);
-  return false;
+  return true;
 
 }  // bepaalMiniMaxiScoreTD
 
@@ -243,7 +246,7 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                   int bedekking, int mogelijkeBedekkingen,
                                   int maxScores[], int minScores[])
 {
-    //TODO: voeg begintoestand toe
+   if(bedekking == 0) return false;
    maxScores[bedekking] = MinScore;
    minScores[bedekking] = MaxScore;
 
@@ -256,10 +259,12 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
    for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2 ) {
       if (vakje &= bedekking) {
           deelBedekking = bedekking ^ vakje;
-          bepaalMiniMaxiScoreTD(laagsteDeelScore, huidigeMinis,
+          if(!bepaalMiniMaxiScoreTD(laagsteDeelScore, huidigeMinis,
                                 hoogsteDeelScore, huidigeMaxis,
                                 deelBedekking, mogelijkeBedekkingen,
-                                maxScores, minScores);
+                                maxScores, minScores)) {
+              // TODO: Haal uit een lijst van coordinaten de score van de huidige.
+          }
 
           auto score = hoogsteDeelScore + maxScores[vakje];
           if(score > maxScores[bedekking]) {
@@ -274,7 +279,7 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
    maxi = hoogsteDeelScore;
    volgordesMaxi += huidigeMaxis;
 
-   return false;
+   return true;
 
 }
 
@@ -307,7 +312,7 @@ void Azul::drukAfZettenReeksen (vector<pair <int,int> > &zettenReeksMini,
 // TODO: implementatie van uw eigen private memberfuncties
 
 
-void Azul::scoreBerekening(int rij, int kolom)
+int Azul::scoreBerekening(int rij, int kolom)
 {
     // horizontale score
     int scoreH = 1;
@@ -328,9 +333,7 @@ void Azul::scoreBerekening(int rij, int kolom)
     else if (scoreV == 1) totaleScoreVakje = scoreH;
     else totaleScoreVakje = scoreH + scoreV;
 
-    score.push_back(totaleScoreVakje);
-
-    totaleScore += totaleScoreVakje;
+    return totaleScoreVakje;
 
 }  // scoreBerekening
 

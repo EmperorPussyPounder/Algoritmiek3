@@ -167,7 +167,7 @@ class Azul
     vector<pair <int,int>> gedaneZetten;
     int totaleScore;
     int beschikbareVakjes;
-    void scoreBerekening(int rij, int kolom);
+    int scoreBerekening(int rij, int kolom);
     bool eindeSpel();
     bool bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                 int &maxi, long long &volgordesMaxi,
