@@ -230,23 +230,37 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
   int maxScores[mogelijkeBedekkingen];
   int minScores[mogelijkeBedekkingen];
   int bedekking = mogelijkeBedekkingen*2 - 1;
+  mini = maxi = volgordesMini = volgordesMaxi = 0;
 
-  int recurrence = 0; //vervang met gepaste recursie functie later.
-  int deelBedekking;
   maxScores[bedekking] = MinScore;
   minScores[bedekking] = MaxScore;
-  for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2 ) {
-      if (vakje &= bedekking) {
-          deelBedekking = bedekking ^ vakje;
-          auto score = recurrence + maxScores[vakje];
-          if(score > maxScores[bedekking]) maxScores[bedekking] = score;
-          //TODO: houd dezelfde scores bij, zoals bij de recursie
-      }
-  }
-
+  bepaalMiniMaxiScoreTD(mini, volgordesMini, maxi, volgordesMaxi,
+                        bedekking, mogelijkeBedekkingen, maxScores, minScores);
   return false;
 
 }  // bepaalMiniMaxiScoreTD
+
+bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
+                                  int &maxi, long long &volgordesMaxi,
+                                  int bedekking, int mogelijkeBedekkingen,
+                                  int maxScores[], int minScores[])
+{
+   int deelBedekking;
+   int none;
+   long long no;
+   for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2 ) {
+      if (vakje &= bedekking) {
+          deelBedekking = bedekking ^ vakje;
+          auto score = bepaalMiniMaxiScoreTD(none, no, none, no,
+                                             deelBedekking, mogelijkeBedekkingen,
+                                             maxScores, minScores) + maxScores[vakje];
+          if(score > maxScores[bedekking]) maxScores[bedekking] = score;
+          //TODO: houd dezelfde scores bij, zoals bij de recursie
+          //TODO: op een mooie manier < implementatie
+      }
+  }
+
+}
 
 //*************************************************************************
 
