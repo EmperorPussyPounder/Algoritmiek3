@@ -17,7 +17,7 @@ Azul::Azul ()
 
     for (int i = 0; i < hoogte; ++i) {
         for (int j = 0; j < breedte; ++j) {
-            bord[i][j] = false;
+            bord[i][j] = Leeg;
         }
     }
 
@@ -60,49 +60,41 @@ int Azul::getVakje (int rij, int kolom)
 
 bool Azul::leesInBord (const char* invoerNaam)
 {
+    geldigBord = false;
     ifstream fin;
     fin.open (invoerNaam);
-    if (!fin.is_open()){
-        geldigBord = false;
-        return false;
+    if (!fin.is_open()) {
+        cout << "We konden de file niet openen. \n";
+        return geldigBord;
     }
-
-    int tempgetal = -1;
+    auto input = -1;
     fin >> hoogte >> breedte;
+    beschikbareVakjes = hoogte*breedte;
 
-    if (hoogte > MaxDimensie || breedte > MaxDimensie){
-        geldigBord = false;
-        return false;
-    }
+    if (!integerInBereik("hoogte", hoogte, 1, MaxDimensie)
+    || !integerInBereik("breedte", breedte, 1, MaxDimensie)) return geldigBord;
 
     bool tempBord[MaxDimensie][MaxDimensie];
 
     for (int i = 0; i < hoogte; ++i) {
         for (int j = 0; j < breedte; ++j) {
-            fin >> tempgetal;
-            if (tempgetal == 0){
-                tempBord[i][j] = false;
+            fin >> input;
+            if (!integerInBereik("bord vakje", input, Leeg, Gevuld))
+            {
+                fin.close();
+                return geldigBord;
             }
-            else if (tempgetal == 1){
-                tempBord[i][j] = true;
-            }
-            else{
-                geldigBord = false;
-                return false;
-            }
-        }
+            tempBord[i][j] = input;
+            beschikbareVakjes -= input;
     }
     fin.close();
-
+    geldigBord = true;
     for (int i = 0; i < hoogte; ++i) {
         for (int j = 0; j < breedte; ++j) {
             bord[i][j] = tempBord[i][j];
         }
     }
-
-    geldigBord = true;
-
-    return true;
+    return geldigBord;
 
 }  // leesInBord
 
@@ -176,7 +168,8 @@ bool Azul::bepaalMiniMaxiScoreRec(int &mini, long long &volgordesMini, int &maxi
     if (!geldigBord){
         return false;
     }
-
+    const auto INT_MAX = 999999999;
+    const auto INT_MIN = -1*INT_MAX;
     mini = INT_MAX;
     maxi = INT_MIN;
     volgordesMini = 0;
@@ -294,15 +287,7 @@ void Azul::scoreBerekening(int rij, int kolom)
 
 bool Azul::eindeSpel()
 {
-    for (int i = 0; i < hoogte; ++i) {
-        for (int j = 0; j < breedte; ++j) {
-            if (!bord[i][j]){
-                return false;
-            }
-        }
-    }
-    return true;
-
+    return !beschikbareVakjes;
 }  // eindespel
 
 //****************************************************************************

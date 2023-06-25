@@ -4,7 +4,8 @@
 #define ConstantesHVar  // ge-include wordt
 
 const int MaxDimensie = 5;
-
+const int Leeg = 0;
+const int Gevuld = 1;
 // TODO: uw eigen constantes
 
 #endif

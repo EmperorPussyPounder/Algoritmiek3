@@ -166,6 +166,7 @@ class Azul
     vector<int> score;
     vector<pair <int,int>> gedaneZetten;
     int totaleScore;
+    int beschikbareVakjes;
     void scoreBerekening(int rij, int kolom);
     bool eindeSpel();
 
