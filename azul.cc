@@ -60,6 +60,7 @@ int Azul::getVakje (int rij, int kolom)
 
 bool Azul::leesInBord (const char* invoerNaam)
 {
+    while(!gedaneZetten.empty()) gedaneZetten.pop_back();
     geldigBord = false;
     ifstream fin;
     fin.open (invoerNaam);
