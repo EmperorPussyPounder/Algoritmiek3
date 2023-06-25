@@ -232,8 +232,6 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
   int bedekking = mogelijkeBedekkingen*2 - 1;
   mini = maxi = volgordesMini = volgordesMaxi = 0;
 
-  maxScores[bedekking] = MinScore;
-  minScores[bedekking] = MaxScore;
   bepaalMiniMaxiScoreTD(mini, volgordesMini, maxi, volgordesMaxi,
                         bedekking, mogelijkeBedekkingen, maxScores, minScores);
   return false;
@@ -245,20 +243,38 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                   int bedekking, int mogelijkeBedekkingen,
                                   int maxScores[], int minScores[])
 {
+    //TODO: voeg begintoestand toe
+   maxScores[bedekking] = MinScore;
+   minScores[bedekking] = MaxScore;
+
    int deelBedekking;
-   int none;
-   long long no;
+   int laagsteDeelScore;
+   int hoogsteDeelScore;
+   long long huidigeMinis = 0;
+   long long huidigeMaxis = 0;
+
    for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2 ) {
       if (vakje &= bedekking) {
           deelBedekking = bedekking ^ vakje;
-          auto score = bepaalMiniMaxiScoreTD(none, no, none, no,
-                                             deelBedekking, mogelijkeBedekkingen,
-                                             maxScores, minScores) + maxScores[vakje];
-          if(score > maxScores[bedekking]) maxScores[bedekking] = score;
+          bepaalMiniMaxiScoreTD(laagsteDeelScore, huidigeMinis,
+                                hoogsteDeelScore, huidigeMaxis,
+                                deelBedekking, mogelijkeBedekkingen,
+                                maxScores, minScores);
+
+          auto score = hoogsteDeelScore + maxScores[vakje];
+          if(score > maxScores[bedekking]) {
+              maxScores[bedekking] = score;
+              huidigeMaxis = 1;
+          }
+          if(score == maxScores[bedekking]) ++huidigeMaxis;
           //TODO: houd dezelfde scores bij, zoals bij de recursie
           //TODO: op een mooie manier < implementatie
       }
   }
+   maxi = hoogsteDeelScore;
+   volgordesMaxi += huidigeMaxis;
+
+   return false;
 
 }
 
