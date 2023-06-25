@@ -161,6 +161,15 @@ class Azul
 
   private:
     int hoogte, breedte;   // hoogte, breedte van het bord
+    bool bord[MaxDimensie][MaxDimensie];
+    bool geldigBord;
+    vector<int> score;
+    vector<pair <int,int>> gedaneZetten;
+    int totaleScore;
+    void scoreBerekening(int rij, int kolom);
+    bool eindeSpel();
+
+
 
   // TODO: uw eigen private memberfuncties en -variabelen
 
