@@ -225,6 +225,24 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                   int &maxi, long long &volgordesMaxi)
 {
   // TODO: implementeer deze memberfunctie
+  int mogelijkeBedekkingen = 1;
+  for (auto i = 0; i < beschikbareVakjes; ++i) mogelijkeBedekkingen *= 2;
+  int maxScores[mogelijkeBedekkingen];
+  int minScores[mogelijkeBedekkingen];
+  int bedekking = mogelijkeBedekkingen*2 - 1;
+
+  int recurrence = 0; //vervang met gepaste recursie functie later.
+  int deelBedekking;
+  maxScores[bedekking] = MinScore;
+  minScores[bedekking] = MaxScore;
+  for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2 ) {
+      if (vakje &= bedekking) {
+          deelBedekking = bedekking ^ vakje;
+          auto score = recurrence + maxScores[vakje];
+          if(score > maxScores[bedekking]) maxScores[bedekking] = score;
+          //TODO: houd dezelfde scores bij, zoals bij de recursie
+      }
+  }
 
   return false;
 
@@ -239,7 +257,7 @@ bool Azul::bepaalMiniMaxiScoreBU (int &mini, long long &volgordesMini,
 {
   // TODO: implementeer deze memberfunctie
 
-  return false;
+  return true;
 
 }  // bepaalMiniMaxiScoreBU
 
@@ -249,7 +267,7 @@ void Azul::drukAfZettenReeksen (vector<pair <int,int> > &zettenReeksMini,
                                 vector<pair <int,int> > &zettenReeksMaxi)
 {
   if (zettenReeksMini.empty()) {
-      cout << "Geen zetten. \n";
+      cout << "Geen zetten hoeven voor de minimale en maximale score gezet worden. \n";
   }
 
 }  // drukAfZettenReeksen
