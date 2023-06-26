@@ -255,11 +255,11 @@ void Azul::vakScores(int * maxScores, int * minScores,
     for (auto rij = 0; rij < hoogte; ++rij) {
         for (auto kolom = 0; kolom < breedte; ++kolom) {
             if(doeZet(rij, kolom)) {
+                unDoeZet();
                 auto score = scoreBerekening(rij, kolom);
                 maxScores[index] = score;
                 coordinaten[index] = make_pair(rij, kolom);
                 index *= 2;
-                unDoeZet();
             }
         }
     }
@@ -281,10 +281,6 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
       maxi = 0;
       return true;
     }
-   //TODO: doeZet en ondoeZet waar nodig.
-   maxScores[bedekking] = MinScore;
-   minScores[bedekking] = MaxScore;
-
    int deelBedekking;
    int laagsteDeelScore;
    int hoogsteDeelScore;
@@ -293,17 +289,11 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
    for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2) {
       if (vakje & bedekking) {
           deelBedekking = bedekking ^ vakje;
-          auto spoof = deelBedekking;
-          while(spoof) {
-              cout << (spoof & 1);
-              spoof >>= 1;
-          }
-          cout << endl;
 
           auto vakRij = coordinaten[vakje].first;
           auto vakKolom = coordinaten[vakje].second;
           doeZet(vakRij, vakKolom);
-          if(maxScores[deelBedekking]) {
+          if (maxScores[deelBedekking]) {
               hoogsteDeelScore = maxScores[deelBedekking];
           }
           else {
@@ -316,7 +306,6 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
           }
           auto score = hoogsteDeelScore + maxScores[vakje];
           if(score > maxScores[bedekking]) {
-
               maxScores[bedekking] = score;
               huidigeMaxis = 1;
           }
@@ -327,7 +316,7 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
         }
       }
 
-   maxi = hoogsteDeelScore;
+   maxi = maxScores[bedekking];
    volgordesMaxi += huidigeMaxis;
 
    return true;
