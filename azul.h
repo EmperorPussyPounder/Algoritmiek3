@@ -170,8 +170,7 @@ class Azul
     int beschikbareVakjes;
     int scoreBerekening(int rij, int kolom);
     bool eindeSpel();
-    void vakScores(int * maxScores, int * minScores,
-                   map<int, pair<int,int>> & coordinaten);
+    void vakVolgorde(map<int, pair<int,int>> & coordinaten);
     bool bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                 int &maxi, long long &volgordesMaxi,
                                 int bedekking, int mogelijkeBedekkingen,
