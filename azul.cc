@@ -290,10 +290,8 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
    int hoogsteDeelScore;
    long long huidigeMinis = 0;
    long long huidigeMaxis = 0;
-
-   for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2 ) {
-      if (vakje &= bedekking) {
-
+   for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2) {
+      if (vakje & bedekking) {
           deelBedekking = bedekking ^ vakje;
           auto spoof = deelBedekking;
           while(spoof) {
