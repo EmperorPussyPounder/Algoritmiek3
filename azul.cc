@@ -241,6 +241,7 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
   int bedekking = mogelijkeBedekkingen - 1;
   mini = maxi = volgordesMini = volgordesMaxi = 0;
   maxi = 0;
+  volgordesMaxi = 0;
   bepaalMiniMaxiScoreTD(mini, volgordesMini, maxi, volgordesMaxi,
                         bedekking, mogelijkeBedekkingen, maxScores,
                         minScores, vakMap);
@@ -268,12 +269,6 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                   int * maxScores, int * minScores,
                                   map<int, pair<int,int>> & coordinaten)
 {
-    auto spoof = bedekking;
-    while(spoof) {
-        cout << (spoof & 1);
-        spoof >>= 1;
-    }
-    cout << endl;
     if (!bedekking)  {
       maxi = 0;
 
@@ -294,7 +289,6 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
               hoogsteDeelScore = maxScores[deelBedekking];
           }
           else {
-
             doeZet(vakRij, vakKolom);
             hoogsteDeelScore = scoreBerekening(vakRij, vakKolom);
             bepaalMiniMaxiScoreTD(laagsteDeelScore, huidigeMinis,
@@ -311,7 +305,7 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
               maxScores[bedekking] = score;
               huidigeMaxis = 1;
           }
-          else if(score == maxScores[bedekking]) ++huidigeMaxis;
+          else if(score == maxScores[bedekking] && !deelBedekking) ++huidigeMaxis;
           //TODO: houd dezelfde scores bij, zoals bij de recursie
           //TODO: op een mooie manier < implementatie
         }
