@@ -292,7 +292,6 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
           auto vakKolom = coordinaten[vakje].second;
           if (maxScores[deelBedekking]) {
               hoogsteDeelScore = maxScores[deelBedekking];
-              bezocht = true;
           }
           else {
 
