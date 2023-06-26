@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <map>
 #include "standaard.h"
 #include "azul.h"
 using namespace std;
@@ -235,17 +236,20 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
   for (auto i = 0; i < mogelijkeBedekkingen; ++i) maxScores[i] = 0;
   int minScores[mogelijkeBedekkingen];
   for (auto i = 0; i < mogelijkeBedekkingen; ++i) minScores[i] = 0;
-  vakScores(maxScores, minScores);
+  map<int, pair<int,int>> vakMap;
+  vakScores(maxScores, minScores, vakMap);
   int bedekking = mogelijkeBedekkingen*2 - 1;
   mini = maxi = volgordesMini = volgordesMaxi = 0;
 
   bepaalMiniMaxiScoreTD(mini, volgordesMini, maxi, volgordesMaxi,
-                        bedekking, mogelijkeBedekkingen, maxScores, minScores);
+                        bedekking, mogelijkeBedekkingen, maxScores,
+                        minScores, vakMap);
   return true;
 
 }  // bepaalMiniMaxiScoreTD
 
-void Azul::vakScores(int maxScores[], int minScores[])
+void Azul::vakScores(int maxScores[], int minScores[],
+                     map<int,pair<int,int>> & coordinaten)
 {
     auto index = 1;
     for (auto rij = 0; rij < hoogte; ++rij) {
@@ -253,6 +257,7 @@ void Azul::vakScores(int maxScores[], int minScores[])
             if(doeZet(rij, kolom)) {
                 auto score = scoreBerekening(rij, kolom);
                 maxScores[index] = score;
+                coordinaten[index] = make_pair(rij, kolom);
                 index *= 2;
                 unDoeZet();
             }
@@ -263,7 +268,8 @@ void Azul::vakScores(int maxScores[], int minScores[])
 bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                   int &maxi, long long &volgordesMaxi,
                                   int bedekking, int mogelijkeBedekkingen,
-                                  int maxScores[], int minScores[])
+                                  int maxScores[], int minScores[],
+                                  map<int, pair<int,int>> & coordinaten)
 {
     if (!bedekking)  {
       mini = maxi = 0;
@@ -283,24 +289,31 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
       if (vakje &= bedekking) {
 
           deelBedekking = bedekking ^ vakje;
+          auto vakRij = coordinaten[vakje].first;
+          auto vakKolom = coordinaten[vakje].second;
+          doeZet(vakRij, vakKolom);
           if(maxScores[deelBedekking]) {
               hoogsteDeelScore = maxScores[deelBedekking];
           }
           else {
 
           bepaalMiniMaxiScoreTD(laagsteDeelScore, huidigeMinis,
-                                    hoogsteDeelScore, huidigeMaxis,
-                                    deelBedekking, mogelijkeBedekkingen,
-                                    maxScores, minScores);
+                                hoogsteDeelScore, huidigeMaxis,
+                                deelBedekking, mogelijkeBedekkingen,
+                                maxScores, minScores,
+                                coordinaten);
           }
           auto score = hoogsteDeelScore + maxScores[vakje];
           if(score > maxScores[bedekking]) {
+
               maxScores[bedekking] = score;
               huidigeMaxis = 1;
           }
-          if(score == maxScores[bedekking]) ++huidigeMaxis;
+          else if(score == maxScores[bedekking]) ++huidigeMaxis;
+          cout << huidigeMaxis << endl;
           //TODO: houd dezelfde scores bij, zoals bij de recursie
           //TODO: op een mooie manier < implementatie
+          unDoeZet();
       }
   }
    maxi = hoogsteDeelScore;
