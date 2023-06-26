@@ -228,10 +228,14 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                   int &maxi, long long &volgordesMaxi)
 {
   // TODO: implementeer deze memberfunctie
+  if(!geldigBord) return false;
   int mogelijkeBedekkingen = 1;
   for (auto i = 0; i < beschikbareVakjes; ++i) mogelijkeBedekkingen *= 2;
   int maxScores[mogelijkeBedekkingen];
+  for (auto i = 0; i < mogelijkeBedekkingen; ++i) maxScores[i] = 0;
   int minScores[mogelijkeBedekkingen];
+  for (auto i = 0; i < mogelijkeBedekkingen; ++i) minScores[i] = 0;
+  vakScores(maxScores, minScores);
   int bedekking = mogelijkeBedekkingen*2 - 1;
   mini = maxi = volgordesMini = volgordesMaxi = 0;
 
@@ -241,12 +245,31 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
 
 }  // bepaalMiniMaxiScoreTD
 
+void Azul::vakScores(int maxScores[], int minScores[])
+{
+    auto index = 1;
+    for (auto rij = 0; rij < hoogte; ++rij) {
+        for (auto kolom = 0; kolom < breedte; ++kolom) {
+            if(doeZet(rij, kolom)) {
+                auto score = scoreBerekening(rij, kolom);
+                maxScores[index] = score;
+                index *= 2;
+                unDoeZet();
+            }
+        }
+    }
+}
+
 bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                   int &maxi, long long &volgordesMaxi,
                                   int bedekking, int mogelijkeBedekkingen,
                                   int maxScores[], int minScores[])
 {
-   if(bedekking == 0) return false;
+    if (!bedekking)  {
+      mini = maxi = 0;
+      return true;
+    }
+   //TODO: doeZet en ondoeZet waar nodig.
    maxScores[bedekking] = MinScore;
    minScores[bedekking] = MaxScore;
 
@@ -258,14 +281,18 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
 
    for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2 ) {
       if (vakje &= bedekking) {
-          deelBedekking = bedekking ^ vakje;
-          if(!bepaalMiniMaxiScoreTD(laagsteDeelScore, huidigeMinis,
-                                hoogsteDeelScore, huidigeMaxis,
-                                deelBedekking, mogelijkeBedekkingen,
-                                maxScores, minScores)) {
-              // TODO: Haal uit een lijst van coordinaten de score van de huidige.
-          }
 
+          deelBedekking = bedekking ^ vakje;
+          if(maxScores[deelBedekking]) {
+              hoogsteDeelScore = maxScores[deelBedekking];
+          }
+          else {
+
+          bepaalMiniMaxiScoreTD(laagsteDeelScore, huidigeMinis,
+                                    hoogsteDeelScore, huidigeMaxis,
+                                    deelBedekking, mogelijkeBedekkingen,
+                                    maxScores, minScores);
+          }
           auto score = hoogsteDeelScore + maxScores[vakje];
           if(score > maxScores[bedekking]) {
               maxScores[bedekking] = score;
