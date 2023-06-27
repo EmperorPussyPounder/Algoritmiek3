@@ -235,7 +235,7 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
   pair<int,int> maxScores[mogelijkeBedekkingen];
   for (auto i = 0; i < mogelijkeBedekkingen; ++i)
     maxScores[i] = make_pair(MinScore,1);
-  pair<int,int> minScores[mogelijkeBedekkingen];
+  pair<int,int>  minScores[mogelijkeBedekkingen];
   for (auto i = 0; i < mogelijkeBedekkingen; ++i)
     minScores[i] = make_pair(MaxScore,1);
   minScores[0].first = 0;
@@ -271,53 +271,52 @@ void Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                   pair<int,int> * maxScores, pair<int,int> * minScores,
                                   map<int, pair<int,int>> & coordinaten)
 {
-    if (!bedekking) return;
+  if (!bedekking) return;
 
-   int deelBedekking;
-   auto laagsteDeelScore = 0;
-   auto hoogsteDeelScore = 0;
-   for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2) {
-      if (vakje & bedekking) {
-          deelBedekking = bedekking ^ vakje;
+  int deelBedekking;
+  auto laagsteDeelScore = 0;
+  auto hoogsteDeelScore = 0;
+  for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2) {
+     if (vakje & bedekking) {
+       deelBedekking = bedekking ^ vakje;
 
-          auto vakRij = coordinaten[vakje].first;
-          auto vakKolom = coordinaten[vakje].second;
-          if (maxScores[deelBedekking].first) {
-            hoogsteDeelScore = maxScores[deelBedekking].first;
-            laagsteDeelScore = minScores[deelBedekking].first;
-          }
-          else {
-            doeZet(vakRij, vakKolom);
-            bepaalMiniMaxiScoreTD(laagsteDeelScore, volgordesMini,
-                                hoogsteDeelScore, volgordesMaxi,
-                                deelBedekking, mogelijkeBedekkingen,
-                                maxScores, minScores,
-                                coordinaten);
-            unDoeZet();
-          }
+       auto vakRij = coordinaten[vakje].first;
+       auto vakKolom = coordinaten[vakje].second;
+       if (!maxScores[deelBedekking].first) {
+         doeZet(vakRij, vakKolom);
+         bepaalMiniMaxiScoreTD(mini, volgordesMini,
+                               maxi, volgordesMaxi,
+                               deelBedekking, mogelijkeBedekkingen,
+                               maxScores, minScores,
+                               coordinaten);
+         unDoeZet();
+       }
+
+       hoogsteDeelScore = maxScores[deelBedekking].first;
+       laagsteDeelScore = minScores[deelBedekking].first;
 
 
-          auto score2 = laagsteDeelScore + scoreBerekening(vakRij, vakKolom);
-          auto score1 = hoogsteDeelScore + scoreBerekening(vakRij, vakKolom);
-          if(score1 > maxScores[bedekking].first) {
-              maxScores[bedekking].first = score1;
-              maxScores[bedekking].second = maxScores[deelBedekking].second;
-          }
-          else if(score1 == maxScores[bedekking].first) maxScores[bedekking].second += maxScores[deelBedekking].second;
+       auto score2 = laagsteDeelScore + scoreBerekening(vakRij, vakKolom);
+       auto score1 = hoogsteDeelScore + scoreBerekening(vakRij, vakKolom);
+       if(score1 > maxScores[bedekking].first) {
+         maxScores[bedekking].first = score1;
+         maxScores[bedekking].second = maxScores[deelBedekking].second;
+       }
+       else if(score1 == maxScores[bedekking].first) maxScores[bedekking].second += maxScores[deelBedekking].second;
 
           //TODO: op een mooie manier < implementatie
-          if (score2 < minScores[bedekking].first) {
-              minScores[bedekking].first = score2;
-              minScores[bedekking].second = minScores[deelBedekking].second;
-          }
-          else if(score2 == minScores[bedekking].first) minScores[bedekking].second += minScores[deelBedekking].second;
-        }
-      }
+       if (score2 < minScores[bedekking].first) {
+         minScores[bedekking].first = score2;
+         minScores[bedekking].second = minScores[deelBedekking].second;
+       }
+       else if(score2 == minScores[bedekking].first) minScores[bedekking].second += minScores[deelBedekking].second;
+     }
+  }
 
-   maxi = maxScores[bedekking].first;
-   mini = minScores[bedekking].first;
-   volgordesMaxi = maxScores[bedekking].second;
-   volgordesMini = minScores[bedekking].second;
+  maxi = maxScores[bedekking].first;
+  mini = minScores[bedekking].first;
+  volgordesMaxi = maxScores[bedekking].second;
+  volgordesMini = minScores[bedekking].second;
 
 }
 
