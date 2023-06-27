@@ -232,16 +232,18 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
   if(!geldigBord) return false;
   int mogelijkeBedekkingen = 1;
   for (auto i = 0; i < beschikbareVakjes; ++i) mogelijkeBedekkingen *= 2;
-  int maxScores[mogelijkeBedekkingen];
-  for (auto i = 0; i < mogelijkeBedekkingen; ++i) maxScores[i] = 0;
+  pair<int,int> maxScores[mogelijkeBedekkingen];
+  for (auto i = 0; i < mogelijkeBedekkingen; ++i) maxScores[i] = make_pair(0,1);
+  for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2) ++maxScores[vakje].second;
   int minScores[mogelijkeBedekkingen];
   for (auto i = 0; i < mogelijkeBedekkingen; ++i) minScores[i] = 0;
   map<int, pair<int,int>> vakMap;
   vakVolgorde(vakMap);
+
   int bedekking = mogelijkeBedekkingen - 1;
   mini = maxi = volgordesMini = volgordesMaxi = 0;
   maxi = 0;
-  volgordesMaxi = 0;
+  volgordesMaxi = 1;
   bepaalMiniMaxiScoreTD(mini, volgordesMini, maxi, volgordesMaxi,
                         bedekking, mogelijkeBedekkingen, maxScores,
                         minScores, vakMap);
@@ -266,33 +268,36 @@ void Azul::vakVolgorde(map<int,pair<int,int>> & coordinaten)
 bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                   int &maxi, long long &volgordesMaxi,
                                   int bedekking, int mogelijkeBedekkingen,
-                                  int * maxScores, int * minScores,
+                                  pair<int,int> * maxScores, int * minScores,
                                   map<int, pair<int,int>> & coordinaten)
 {
     if (!bedekking)  {
-      maxi = 0;
+       maxi = 0;
 
-      return true;
+      return 0;
     }
    int deelBedekking;
    int laagsteDeelScore;
    int hoogsteDeelScore;
    long long huidigeMinis = 0;
-   long long huidigeMaxis = 0;
+   long long huidigeMaxis = 1;
+   long long huidigeDeelMaxis = 1;
    for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2) {
       if (vakje & bedekking) {
           deelBedekking = bedekking ^ vakje;
 
           auto vakRij = coordinaten[vakje].first;
           auto vakKolom = coordinaten[vakje].second;
-          if (maxScores[deelBedekking]) {
-              hoogsteDeelScore = maxScores[deelBedekking];
+          if (maxScores[deelBedekking].first) {
+              hoogsteDeelScore = maxScores[deelBedekking].first;
+              huidigeMaxis = maxScores[deelBedekking].second;
           }
           else {
             doeZet(vakRij, vakKolom);
             hoogsteDeelScore = scoreBerekening(vakRij, vakKolom);
+
             bepaalMiniMaxiScoreTD(laagsteDeelScore, huidigeMinis,
-                                hoogsteDeelScore, huidigeMaxis,
+                                hoogsteDeelScore, huidigeDeelMaxis,
                                 deelBedekking, mogelijkeBedekkingen,
                                 maxScores, minScores,
                                 coordinaten);
@@ -301,18 +306,18 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
           }
 
           auto score = hoogsteDeelScore + scoreBerekening(vakRij, vakKolom);
-          if(score > maxScores[bedekking]) {
-              maxScores[bedekking] = score;
-              huidigeMaxis = 1;
+          if(score > maxScores[bedekking].first) {
+              maxScores[bedekking].first = score;
+              maxScores[bedekking].second = maxScores[deelBedekking].second;
           }
-          else if(score == maxScores[bedekking] && !deelBedekking) ++huidigeMaxis;
+          else if(score == maxScores[bedekking].first) maxScores[bedekking].second += maxScores[deelBedekking].second;
           //TODO: houd dezelfde scores bij, zoals bij de recursie
           //TODO: op een mooie manier < implementatie
         }
       }
 
-   maxi = maxScores[bedekking];
-   volgordesMaxi += huidigeMaxis;
+   maxi = maxScores[bedekking].first;
+   volgordesMaxi = maxScores[bedekking].second;
 
    return true;
 
