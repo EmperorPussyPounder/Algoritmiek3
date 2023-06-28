@@ -45,17 +45,12 @@ Azul::~Azul ()
 
 int Azul::getVakje (int rij, int kolom)
 {
-    if (!geldigBord || rij > hoogte - 1 || kolom > breedte - 1) {
+    if (!geldigBord
+        || !integerInBereik(rij,0, hoogte)
+        || !integerInBereik(kolom, 0, breedte) ) {
         return -1;
     }
-
-    if (!bord[rij][kolom]){
-        return 0;
-    }
-    else{
-        return 1;
-    }
-
+    return bord[rij][kolom];
 }  // getVakje
 
 //*************************************************************************
@@ -129,7 +124,7 @@ void Azul::drukAfBord ()
 
 bool Azul::doeZet (int rij, int kolom)
 {
-    if (!geldigBord || rij >= hoogte || kolom >= breedte || bord[rij][kolom]) {
+    if (getVakje(rij, kolom)) {
         return false;
     }
 
