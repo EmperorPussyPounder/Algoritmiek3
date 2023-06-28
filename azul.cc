@@ -223,21 +223,28 @@ bool Azul::bepaalMiniMaxiScoreRec(int &mini, long long &volgordesMini, int &maxi
 
 //*************************************************************************
 
+void Azul::initializeer(int & mogelijkeBedekkingen,
+                        map<int,pair<int, long long>> & maxScores,
+                        map<int,pair<int, long long>> & minScores)
+{
+  for (auto i = 0; i < beschikbareVakjes; ++i) mogelijkeBedekkingen *= 2;
+  for (auto i = 0; i < mogelijkeBedekkingen; ++i)
+    maxScores[i] = make_pair(MinScore,1);
+  for (auto i = 0; i < mogelijkeBedekkingen; ++i)
+    minScores[i] = make_pair(MaxScore,1);
+  minScores[0].first = 0;
+
+}
+
 bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                   int &maxi, long long &volgordesMaxi)
 {
   if(!geldigBord) return false;
   int mogelijkeBedekkingen = 1;
-  for (auto i = 0; i < beschikbareVakjes; ++i) mogelijkeBedekkingen *= 2;
-
   map<int, pair<int,long long>> maxScores;
-  for (auto i = 0; i < mogelijkeBedekkingen; ++i)
-    maxScores[i] = make_pair(MinScore,1);
   map<int, pair<int, long long>>  minScores;
-  for (auto i = 0; i < mogelijkeBedekkingen; ++i)
-    minScores[i] = make_pair(MaxScore,1);
-  minScores[0].first = 0;
   map<int, pair<int,int>> vakMap;
+  initializeer(mogelijkeBedekkingen, maxScores, minScores);
   vakVolgorde(vakMap);
 
   int bedekking = mogelijkeBedekkingen - 1;
@@ -310,6 +317,26 @@ void Azul::bepaalMiniMaxiScoreTD (const int & bedekking,
 
 //*************************************************************************
 
+void Azul::bepaalVolgorde(const int & GrensBedekking,
+                          map<int,int> & subMinToLast,
+                          map<int,int> & subMaxToLast,
+                          map<int, pair<int,int>> & vakMap,
+                          vector<pair <int,int> > &zettenReeksMini,
+                          vector<pair <int,int> > &zettenReeksMaxi)
+{
+  auto overdekking1 = GrensBedekking;
+  auto overdekking2 = GrensBedekking;
+  while (overdekking1 > 0 || overdekking2 > 0 ) {
+    auto vakje1 = subMaxToLast[overdekking1];
+    auto vakje2 = subMinToLast[overdekking2];
+    zettenReeksMaxi.push_back(vakMap[vakje1]);
+    overdekking1 ^= vakje1;
+    zettenReeksMini.push_back(vakMap[vakje2]);
+    overdekking2 ^= vakje2;
+  }
+}
+
+//*************************************************************************
 bool Azul::bepaalMiniMaxiScoreBU (int &mini, long long &volgordesMini,
                                   int &maxi, long long &volgordesMaxi,
                                   vector< pair<int,int> > &zettenReeksMini,
@@ -317,17 +344,12 @@ bool Azul::bepaalMiniMaxiScoreBU (int &mini, long long &volgordesMini,
 {
   if(!geldigBord) return false;
   int mogelijkeBedekkingen = 1;
-  for (auto i = 0; i < beschikbareVakjes; ++i) mogelijkeBedekkingen *= 2;
   map<int,pair<int,long long>> maxScores;
-  map<int,int> subMaxToLast;
-  for (auto i = 0; i < mogelijkeBedekkingen; ++i)
-    maxScores[i] = make_pair(MinScore,1);
   map<int, pair<int,long long>>  minScores;
-  map<int,int> subMinToLast;
-  for (auto i = 0; i < mogelijkeBedekkingen; ++i)
-    minScores[i] = make_pair(MaxScore,1);
-  minScores[0].first = 0;
   map<int, pair<int,int>> vakMap;
+  map<int,int> subMinToLast;
+  map<int,int> subMaxToLast;
+  initializeer(mogelijkeBedekkingen, maxScores, minScores);
   vakVolgorde(vakMap);
 
   const int GrensBedekking = mogelijkeBedekkingen - 1;
@@ -380,20 +402,10 @@ bool Azul::bepaalMiniMaxiScoreBU (int &mini, long long &volgordesMini,
   mini = minScores[GrensBedekking].first;
   volgordesMaxi = maxScores[GrensBedekking].second;
   volgordesMini = minScores[GrensBedekking].second;
-
-  auto overdekking1 = GrensBedekking;
-  auto overdekking2 = GrensBedekking;
-  while (overdekking1 > 0 || overdekking2 > 0 ) {
-    auto vakje1 = subMaxToLast[overdekking1];
-    auto vakje2 = subMinToLast[overdekking2];
-    zettenReeksMaxi.push_back(vakMap[vakje1]);
-    overdekking1 ^= vakje1;
-    zettenReeksMini.push_back(vakMap[vakje2]);
-    overdekking2 ^= vakje2;
-  }
+  bepaalVolgorde(GrensBedekking, subMinToLast, subMaxToLast, vakMap,
+                 zettenReeksMini, zettenReeksMaxi);
 
   return true;
-
 }  // bepaalMiniMaxiScoreBU
 
 //*************************************************************************

@@ -171,11 +171,20 @@ class Azul
     int scoreBerekening(int rij, int kolom);
     bool eindeSpel();
     void vakVolgorde(map<int, pair<int,int>> & coordinaten);
+    void initializeer(int & mogelijkeBedekkingen,
+                      map<int,pair<int, long long>> & maxScores,
+                      map<int,pair<int, long long>> & minScores);
     void bepaalMiniMaxiScoreTD (const int & bedekking,
                                 const int & mogelijkeBedekkingen,
                                 map<int,pair<int,long long>> & maxScores,
                                 map<int,pair<int,long long>> & minScores,
                                 map<int, pair<int,int>> & coordinaten);
+    void bepaalVolgorde(const int & GrensBedekking,
+                        map<int,int> & subMinToLast,
+                        map<int,int> & subMaxToLast,
+                        map<int, pair<int,int>> & vakMap,
+                        vector<pair<int,int>> & zettenReeksMini,
+                        vector<pair<int,int>> & zettenReeksMaxi);
 
 
 
