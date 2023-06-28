@@ -174,7 +174,7 @@ class Azul
     void bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                 int &maxi, long long &volgordesMaxi,
                                 int bedekking, int mogelijkeBedekkingen,
-                                pair<int,int> * maxScores, pair<int,int> * minScores,
+                                map<int,pair<int,long long>> & maxScores, map<int,pair<int,long long>> & minScores,
                                 map<int, pair<int,int>> & coordinaten);
 
 
