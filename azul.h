@@ -171,6 +171,7 @@ class Azul
     int scoreBerekening(int rij, int kolom);
     bool eindeSpel();
     void vakVolgorde(map<int, pair<int,int>> & coordinaten);
+    const map<int,int> DummyMap;
     void initializeer(int & mogelijkeBedekkingen,
                       map<int,pair<int, long long>> & maxScores,
                       map<int,pair<int, long long>> & minScores);
@@ -185,6 +186,12 @@ class Azul
                         map<int, pair<int,int>> & vakMap,
                         vector<pair<int,int>> & zettenReeksMini,
                         vector<pair<int,int>> & zettenReeksMaxi);
+    void updateMiniMaxi(map<int,pair<int,long long>> & minScores,
+                        map<int,pair<int,long long>> & maxScores,
+                        map<int, pair<int,int>> & coordinaten,
+                        const int & vakje, const int & bedekking,
+                        map<int,int> & subMinToLast,
+                        map<int,int> & subMaxToLast);
 
 
 

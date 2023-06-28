@@ -236,6 +236,19 @@ void Azul::initializeer(int & mogelijkeBedekkingen,
 
 }
 
+void Azul::vakVolgorde(map<int,pair<int,int>> & coordinaten)
+{
+    auto index = 1;
+    for (auto rij = 0; rij < hoogte; ++rij) {
+        for (auto kolom = 0; kolom < breedte; ++kolom) {
+            if(bord[rij][kolom] == Leeg) {
+                coordinaten[index] = make_pair(rij, kolom);
+                index *= 2;
+            }
+        }
+    }
+}
+
 bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                   int &maxi, long long &volgordesMaxi)
 {
@@ -259,60 +272,62 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
   return true;
 }  // bepaalMiniMaxiScoreTD
 
-void Azul::vakVolgorde(map<int,pair<int,int>> & coordinaten)
-{
-    auto index = 1;
-    for (auto rij = 0; rij < hoogte; ++rij) {
-        for (auto kolom = 0; kolom < breedte; ++kolom) {
-            if(bord[rij][kolom] == Leeg) {
-                coordinaten[index] = make_pair(rij, kolom);
-                index *= 2;
-            }
-        }
-    }
-}
+
 
 void Azul::bepaalMiniMaxiScoreTD (const int & bedekking,
                                   const int & mogelijkeBedekkingen,
                                   map<int,pair<int,long long>> & maxScores,
                                   map<int,pair<int,long long>> & minScores,
-                                  map<int, pair<int,int>> & coordinaten)
+                                  map<int, pair<int,int>> & vakMap)
 {
   if (!bedekking) return;
   int deelBedekking;
-  long long laagsteDeelScore = 0;
-  long long hoogsteDeelScore = 0;
+  auto DM = DummyMap;
   for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2) {
      if (vakje & bedekking) {
        deelBedekking = bedekking ^ vakje;
-       auto vakRij = coordinaten[vakje].first;
-       auto vakKolom = coordinaten[vakje].second;
+       auto vakRij = vakMap[vakje].first;
+       auto vakKolom = vakMap[vakje].second;
        if (!maxScores[deelBedekking].first) {
          doeZet(vakRij, vakKolom);
          bepaalMiniMaxiScoreTD(deelBedekking, mogelijkeBedekkingen,
                                maxScores, minScores,
-                               coordinaten);
+                               vakMap);
          unDoeZet();
        }
-       hoogsteDeelScore = maxScores[deelBedekking].first;
-       laagsteDeelScore = minScores[deelBedekking].first;
-       auto score2 = laagsteDeelScore  +  scoreBerekening(vakRij, vakKolom);
-       auto score1 = hoogsteDeelScore  +  scoreBerekening(vakRij, vakKolom);
-       if(score1 > maxScores[bedekking].first) {
-         maxScores[bedekking].first = score1;
-         maxScores[bedekking].second = maxScores[deelBedekking].second;
-       }
-       else if(score1 == maxScores[bedekking].first) maxScores[bedekking].second
-                                             += maxScores[deelBedekking].second;
-
-       if (score2 < minScores[bedekking].first) {
-         minScores[bedekking].first = score2;
-         minScores[bedekking].second = minScores[deelBedekking].second;
-       }
-       else if(score2 == minScores[bedekking].first) minScores[bedekking].second
-                                             += minScores[deelBedekking].second;
+       updateMiniMaxi(minScores, maxScores, vakMap, vakje, bedekking, DM, DM);
      }
   }
+}
+
+//*************************************************************************
+void Azul::updateMiniMaxi(map<int,pair<int,long long>> & minScores,
+                          map<int,pair<int,long long>> & maxScores,
+                          map<int, pair<int,int>> & coordinaten,
+                          const int & vakje, const int & bedekking,
+                          map<int,int> & subMinToLast, map<int,int> & subMaxToLast)
+{
+  auto deelBedekking = vakje ^ bedekking;
+  auto vakRij = coordinaten[vakje].first;
+  auto vakKolom = coordinaten[vakje].second;
+  auto hoogsteDeelScore = maxScores[deelBedekking].first;
+  auto laagsteDeelScore = minScores[deelBedekking].first;
+  auto score2 = laagsteDeelScore  +  scoreBerekening(vakRij, vakKolom);
+  auto score1 = hoogsteDeelScore  +  scoreBerekening(vakRij, vakKolom);
+  if(score1 > maxScores[bedekking].first) {
+    maxScores[bedekking].first = score1;
+    maxScores[bedekking].second = maxScores[deelBedekking].second;
+    subMaxToLast[bedekking] = vakje;
+  }
+  else if(score1 == maxScores[bedekking].first) maxScores[bedekking].second
+                                             += maxScores[deelBedekking].second;
+  if (score2 < minScores[bedekking].first) {
+    minScores[bedekking].first = score2;
+    minScores[bedekking].second = minScores[deelBedekking].second;
+    subMinToLast[bedekking] = vakje;
+  }
+  else if(score2 == minScores[bedekking].first) minScores[bedekking].second
+                                             += minScores[deelBedekking].second;
 }
 
 //*************************************************************************
@@ -351,13 +366,8 @@ bool Azul::bepaalMiniMaxiScoreBU (int &mini, long long &volgordesMini,
   map<int,int> subMaxToLast;
   initializeer(mogelijkeBedekkingen, maxScores, minScores);
   vakVolgorde(vakMap);
-
   const int GrensBedekking = mogelijkeBedekkingen - 1;
   mini = maxi = volgordesMini = volgordesMaxi = 0;
-
-  int deelBedekking;
-  long long laagsteDeelScore = 0;
-  long long hoogsteDeelScore = 0;
   for (auto bedekking = 1; bedekking <= GrensBedekking; ++bedekking) {
     for(auto vakje = 1; vakje <= bedekking; vakje *= 2) {
       if (!(vakje & bedekking)) continue;
@@ -365,46 +375,20 @@ bool Azul::bepaalMiniMaxiScoreBU (int &mini, long long &volgordesMini,
       auto deelVakKolom = vakMap[vakje].second;
       doeZet(deelVakRij, deelVakKolom);
     }
-
     for (auto vakje = 1; vakje <= bedekking; vakje*=2) {
-
       if (vakje & bedekking) {
-        deelBedekking = bedekking ^ vakje;
-        auto vakRij = vakMap[vakje].first;
-        auto vakKolom = vakMap[vakje].second;
-
-        hoogsteDeelScore = maxScores[deelBedekking].first;
-        laagsteDeelScore = minScores[deelBedekking].first;
-
-
-        auto score2 = laagsteDeelScore + scoreBerekening(vakRij, vakKolom);
-        auto score1 = hoogsteDeelScore + scoreBerekening(vakRij, vakKolom);
-        if(score1 > maxScores[bedekking].first) {
-          maxScores[bedekking].first = score1;
-          maxScores[bedekking].second = maxScores[deelBedekking].second;
-          subMaxToLast[bedekking] = vakje;
-        }
-        else if(score1 == maxScores[bedekking].first) maxScores[bedekking].second += maxScores[deelBedekking].second;
-
-        if (score2 < minScores[bedekking].first) {
-          minScores[bedekking].first = score2;
-          minScores[bedekking].second = minScores[deelBedekking].second;
-          subMinToLast[bedekking] = vakje;
-        }
-        else if(score2 == minScores[bedekking].first) minScores[bedekking].second += minScores[deelBedekking].second;
-        }
+        updateMiniMaxi(minScores, maxScores, vakMap, vakje, bedekking,
+                      subMinToLast, subMaxToLast);
+      }
     }
-
     for(auto vakje = 1; vakje <= bedekking; vakje *= 2) unDoeZet();
   }
-
   maxi = maxScores[GrensBedekking].first;
   mini = minScores[GrensBedekking].first;
   volgordesMaxi = maxScores[GrensBedekking].second;
   volgordesMini = minScores[GrensBedekking].second;
   bepaalVolgorde(GrensBedekking, subMinToLast, subMaxToLast, vakMap,
                  zettenReeksMini, zettenReeksMaxi);
-
   return true;
 }  // bepaalMiniMaxiScoreBU
 
