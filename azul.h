@@ -171,17 +171,16 @@ class Azul
     int scoreBerekening(int rij, int kolom);
     bool eindeSpel();
     void vakVolgorde(map<int, pair<int,int>> & coordinaten);
-    void bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
-                                int &maxi, long long &volgordesMaxi,
-                                int bedekking, int mogelijkeBedekkingen,
-                                map<int,pair<int,long long>> & maxScores, map<int,pair<int,long long>> & minScores,
+    void bepaalMiniMaxiScoreTD (const int & bedekking,
+                                const int & mogelijkeBedekkingen,
+                                map<int,pair<int,long long>> & maxScores,
+                                map<int,pair<int,long long>> & minScores,
                                 map<int, pair<int,int>> & coordinaten);
 
 
 
 
 
-  // TODO: uw eigen private memberfuncties en -variabelen
 
 };
 

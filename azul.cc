@@ -76,9 +76,7 @@ bool Azul::leesInBord (const char* invoerNaam)
 
     if (!integerInBereik("hoogte", hoogte, 1, MaxDimensie)
     || !integerInBereik("breedte", breedte, 1, MaxDimensie)) return geldigBord;
-
     bool tempBord[MaxDimensie][MaxDimensie];
-
     for (int i = 0; i < hoogte; ++i) {
         for (int j = 0; j < breedte; ++j) {
             fin >> input;
@@ -98,7 +96,6 @@ bool Azul::leesInBord (const char* invoerNaam)
         }
     }
     return geldigBord;
-
 }  // leesInBord
 
 
@@ -229,7 +226,6 @@ bool Azul::bepaalMiniMaxiScoreRec(int &mini, long long &volgordesMini, int &maxi
 bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
                                   int &maxi, long long &volgordesMaxi)
 {
-  // TODO: implementeer deze memberfunctie
   if(!geldigBord) return false;
   int mogelijkeBedekkingen = 1;
   for (auto i = 0; i < beschikbareVakjes; ++i) mogelijkeBedekkingen *= 2;
@@ -246,11 +242,14 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
 
   int bedekking = mogelijkeBedekkingen - 1;
   mini = maxi = volgordesMini = volgordesMaxi = 0;
-  bepaalMiniMaxiScoreTD(mini, volgordesMini, maxi, volgordesMaxi,
-                        bedekking, mogelijkeBedekkingen, maxScores,
+  bepaalMiniMaxiScoreTD(bedekking,
+                        mogelijkeBedekkingen, maxScores,
                         minScores, vakMap);
+  maxi = maxScores[bedekking].first;
+  mini = minScores[bedekking].first;
+  volgordesMaxi = maxScores[bedekking].second;
+  volgordesMini = minScores[bedekking].second;
   return true;
-
 }  // bepaalMiniMaxiScoreTD
 
 void Azul::vakVolgorde(map<int,pair<int,int>> & coordinaten)
@@ -266,58 +265,47 @@ void Azul::vakVolgorde(map<int,pair<int,int>> & coordinaten)
     }
 }
 
-void Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
-                                  int &maxi, long long &volgordesMaxi,
-                                  int bedekking, int mogelijkeBedekkingen,
-                                  map<int,pair<int,long long>> & maxScores, map<int,pair<int,long long>> & minScores,
+void Azul::bepaalMiniMaxiScoreTD (const int & bedekking,
+                                  const int & mogelijkeBedekkingen,
+                                  map<int,pair<int,long long>> & maxScores,
+                                  map<int,pair<int,long long>> & minScores,
                                   map<int, pair<int,int>> & coordinaten)
 {
   if (!bedekking) return;
-
   int deelBedekking;
   long long laagsteDeelScore = 0;
   long long hoogsteDeelScore = 0;
   for (auto vakje = 1; vakje < mogelijkeBedekkingen; vakje*=2) {
      if (vakje & bedekking) {
        deelBedekking = bedekking ^ vakje;
-
        auto vakRij = coordinaten[vakje].first;
        auto vakKolom = coordinaten[vakje].second;
        if (!maxScores[deelBedekking].first) {
          doeZet(vakRij, vakKolom);
-         bepaalMiniMaxiScoreTD(mini, volgordesMini,
-                               maxi, volgordesMaxi,
-                               deelBedekking, mogelijkeBedekkingen,
+         bepaalMiniMaxiScoreTD(deelBedekking, mogelijkeBedekkingen,
                                maxScores, minScores,
                                coordinaten);
          unDoeZet();
        }
-
        hoogsteDeelScore = maxScores[deelBedekking].first;
        laagsteDeelScore = minScores[deelBedekking].first;
-
-
        auto score2 = laagsteDeelScore  +  scoreBerekening(vakRij, vakKolom);
        auto score1 = hoogsteDeelScore  +  scoreBerekening(vakRij, vakKolom);
        if(score1 > maxScores[bedekking].first) {
          maxScores[bedekking].first = score1;
          maxScores[bedekking].second = maxScores[deelBedekking].second;
        }
-       else if(score1 == maxScores[bedekking].first) maxScores[bedekking].second += maxScores[deelBedekking].second;
+       else if(score1 == maxScores[bedekking].first) maxScores[bedekking].second
+                                             += maxScores[deelBedekking].second;
 
        if (score2 < minScores[bedekking].first) {
          minScores[bedekking].first = score2;
          minScores[bedekking].second = minScores[deelBedekking].second;
        }
-       else if(score2 == minScores[bedekking].first) minScores[bedekking].second += minScores[deelBedekking].second;
+       else if(score2 == minScores[bedekking].first) minScores[bedekking].second
+                                             += minScores[deelBedekking].second;
      }
   }
-
-  maxi = maxScores[bedekking].first;
-  mini = minScores[bedekking].first;
-  volgordesMaxi = maxScores[bedekking].second;
-  volgordesMini = minScores[bedekking].second;
-
 }
 
 //*************************************************************************
@@ -430,7 +418,6 @@ void Azul::drukAfZettenReeksen (vector<pair <int,int> > &zettenReeksMini,
 
 //*************************************************************************
 
-// TODO: implementatie van uw eigen private memberfuncties
 
 
 int Azul::scoreBerekening(int rij, int kolom)
