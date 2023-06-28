@@ -259,8 +259,8 @@ bool Azul::bepaalMiniMaxiScoreTD (int &mini, long long &volgordesMini,
   bepaalMiniMaxiScoreTD(bedekking,
                         mogelijkeBedekkingen, maxScores,
                         minScores, vakMap);
-  maxi = maxScores[bedekking].first;
-  mini = minScores[bedekking].first;
+  maxi = maxScores[bedekking].first + totaleScore;
+  mini = minScores[bedekking].first + totaleScore;
   volgordesMaxi = maxScores[bedekking].second;
   volgordesMini = minScores[bedekking].second;
   return true;
@@ -381,8 +381,8 @@ bool Azul::bepaalMiniMaxiScoreBU (int &mini, long long &volgordesMini,
       if(vakje & bedekking) unDoeZet();
     }
   }
-  maxi = maxScores[GrensBedekking].first + totaalScore();
-  mini = minScores[GrensBedekking].first;
+  maxi = maxScores[GrensBedekking].first + totaleScore;
+  mini = minScores[GrensBedekking].first + totaleScore;
   volgordesMaxi = maxScores[GrensBedekking].second;
   volgordesMini = minScores[GrensBedekking].second;
   bepaalVolgorde(GrensBedekking, subMinToLast, subMaxToLast, vakMap,
