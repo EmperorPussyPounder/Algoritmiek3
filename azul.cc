@@ -333,6 +333,8 @@ void Azul::bepaalVolgorde(const int & GrensBedekking,
                           vector<pair <int,int> > &zettenReeksMini,
                           vector<pair <int,int> > &zettenReeksMaxi)
 {
+  while(!zettenReeksMini.empty()) zettenReeksMini.pop_back();
+  while(!zettenReeksMaxi.empty()) zettenReeksMaxi.pop_back();
   auto overdekking1 = GrensBedekking;
   auto overdekking2 = GrensBedekking;
   while (overdekking1 > 0 || overdekking2 > 0 ) {
@@ -375,9 +377,11 @@ bool Azul::bepaalMiniMaxiScoreBU (int &mini, long long &volgordesMini,
                       subMinToLast, subMaxToLast);
       }
     }
-    for(auto vakje = 1; vakje <= bedekking; vakje *= 2) unDoeZet();
+    for(auto vakje = 1; vakje <= bedekking; vakje *= 2) {
+      if(vakje & bedekking) unDoeZet();
+    }
   }
-  maxi = maxScores[GrensBedekking].first;
+  maxi = maxScores[GrensBedekking].first + totaalScore();
   mini = minScores[GrensBedekking].first;
   volgordesMaxi = maxScores[GrensBedekking].second;
   volgordesMini = minScores[GrensBedekking].second;

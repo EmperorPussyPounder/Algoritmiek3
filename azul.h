@@ -171,7 +171,6 @@ class Azul
     int scoreBerekening(int rij, int kolom);
     bool eindeSpel();
     void vakVolgorde(map<int, pair<int,int>> & coordinaten);
-    const map<int,int> DummyMap;
     void initializeer(int & mogelijkeBedekkingen,
                       map<int,pair<int, long long>> & maxScores,
                       map<int,pair<int, long long>> & minScores);
