@@ -3,7 +3,6 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include <array>
 #include "standaard.h"
 #include "azul.h"
 using namespace std;
@@ -393,7 +392,8 @@ void Azul::drukAfZettenReeksen (vector<pair <int,int> > &zettenReeksMini,
                                 vector<pair <int,int> > &zettenReeksMaxi)
 {
   if (zettenReeksMini.empty()) {
-      cout << "Geen zetten hoeven voor de minimale en maximale score gezet worden. \n";
+      cout << "Geen zetten hoeven voor de minimale"
+           << "en maximale score gezet worden. \n";
   }
 
   cout << "Voor minimale score vult U:\n";
