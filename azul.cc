@@ -331,11 +331,11 @@ bool Azul::bepaalMiniMaxiScoreBU (int &mini, long long &volgordesMini,
   int mogelijkeBedekkingen = 1;
   for (auto i = 0; i < beschikbareVakjes; ++i) mogelijkeBedekkingen *= 2;
   map<int,pair<int,long long>> maxScores;
-  map<int,pair<int,int>> subMaxToLast;
+  map<int,int> subMaxToLast;
   for (auto i = 0; i < mogelijkeBedekkingen; ++i)
     maxScores[i] = make_pair(MinScore,1);
   map<int, pair<int,long long>>  minScores;
-  map<int,pair<int,int>> subMinToLast;
+  map<int,int> subMinToLast;
   for (auto i = 0; i < mogelijkeBedekkingen; ++i)
     minScores[i] = make_pair(MaxScore,1);
   minScores[0].first = 0;
@@ -372,14 +372,14 @@ bool Azul::bepaalMiniMaxiScoreBU (int &mini, long long &volgordesMini,
         if(score1 > maxScores[bedekking].first) {
           maxScores[bedekking].first = score1;
           maxScores[bedekking].second = maxScores[deelBedekking].second;
-          subMaxToLast[deelBedekking] = vakMap[vakje];
+          subMaxToLast[bedekking] = vakje;
         }
         else if(score1 == maxScores[bedekking].first) maxScores[bedekking].second += maxScores[deelBedekking].second;
 
         if (score2 < minScores[bedekking].first) {
           minScores[bedekking].first = score2;
           minScores[bedekking].second = minScores[deelBedekking].second;
-          subMinToLast[deelBedekking] = vakMap[vakje];
+          subMinToLast[bedekking] = vakje;
         }
         else if(score2 == minScores[bedekking].first) minScores[bedekking].second += minScores[deelBedekking].second;
         }
@@ -393,9 +393,15 @@ bool Azul::bepaalMiniMaxiScoreBU (int &mini, long long &volgordesMini,
   volgordesMaxi = maxScores[GrensBedekking].second;
   volgordesMini = minScores[GrensBedekking].second;
 
-  for (auto overdekking = GrensBedekking; overdekking > 0; overdekking /=2 ) {
-    zettenReeksMaxi.push_back(subMaxToLast[overdekking]);
-    zettenReeksMini.push_back(subMinToLast[overdekking]);
+  auto overdekking1 = GrensBedekking;
+  auto overdekking2 = GrensBedekking;
+  while (overdekking1 > 0 || overdekking2 > 0 ) {
+    auto vakje1 = subMaxToLast[overdekking1];
+    auto vakje2 = subMinToLast[overdekking2];
+    zettenReeksMaxi.push_back(vakMap[vakje1]);
+    overdekking1 ^= vakje1;
+    zettenReeksMini.push_back(vakMap[vakje2]);
+    overdekking2 ^= vakje2;
   }
 
   return true;
@@ -411,11 +417,11 @@ void Azul::drukAfZettenReeksen (vector<pair <int,int> > &zettenReeksMini,
       cout << "Geen zetten hoeven voor de minimale en maximale score gezet worden. \n";
   }
 
-  cout << "Voor minimale score vult U ";
+  cout << "Voor minimale score vult U:\n";
   for (auto vak : zettenReeksMini) cout << "( " << vak.first << ", " << vak.second << " )" << ",\n";
   cout << "Op volgorde in. \n";
 
-  cout << "Voor maximale score vult U ";
+  cout << "Voor maximale score vult U:\n";
   for (auto vak : zettenReeksMaxi) cout << "( " << vak.first << ", " << vak.second << " )" << ",\n";
   cout << "Op volgorde in. \n";
 
