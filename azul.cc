@@ -397,11 +397,13 @@ void Azul::drukAfZettenReeksen (vector<pair <int,int> > &zettenReeksMini,
   }
 
   cout << "Voor minimale score vult U:\n";
-  for (auto vak : zettenReeksMini) cout << "( " << vak.first << ", " << vak.second << " )" << ",\n";
+  for (auto vak : zettenReeksMini) cout << "( " << vak.first  << ", "
+                                        << vak.second << " )" << ",\n";
   cout << "Op volgorde in. \n";
 
   cout << "Voor maximale score vult U:\n";
-  for (auto vak : zettenReeksMaxi) cout << "( " << vak.first << ", " << vak.second << " )" << ",\n";
+  for (auto vak : zettenReeksMaxi) cout << "( " << vak.first  << ", "
+                                        << vak.second << " )" << ",\n";
   cout << "Op volgorde in. \n";
 
 
